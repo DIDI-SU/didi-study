@@ -1,5 +1,17 @@
-interface Greetable {
-  name: string;
+interface AddFm {
+  (a: number, b: number): number;
+}
+let adds: AddFm;
+
+adds = (n1: number, n2: number) => {
+  return n1 + n2;
+};
+interface Named {
+  readonly name?: string;
+  outputName?: string;
+}
+
+interface Greetable extends Named {
   greet(phrase: string): void;
 }
 
@@ -14,7 +26,8 @@ user1 = {
 user1.greet("hi there");
 
 class Person implements Greetable {
-  name: string;
+  name?: string;
+  outputName = "lee";
   constructor(n: string) {
     this.name = n;
   }
