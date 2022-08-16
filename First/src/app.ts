@@ -1,131 +1,69 @@
-type Admin = {
-  name: string;
-  privileges: string[];
-};
+// //배열 타입이 하나 만들어지는데 만약 비어있다면 any가 됩니다
+// //제네릭 타입이면 하나의 인수가 필요하다는 에러
+// // Array<t> 제네릭
+// // 제네릭은 타입은 다른 타입과 연결되는 종류인데 다른 타입이
+// //어떤 타입이어야하는지 대해서는 크게 상관하지 않습니다
+// //아래가 바로 제네릭
+// const name2: Array<string> = []; //string[]과 결국 같은이야기
 
-type Employee = {
-  name: string;
-  startDate: Date;
-};
-//
-//인터섹션타입은 객체의 경우 객체 속성의 조합
-type ElevatedEmpployee = Admin & Employee;
+// //프로미스타입
+// const promise: Promise<string> = new Promise((re, rej) => {
+//   setTimeout(() => {
+//     re("done");
+//   }, 2000);
+// });
 
-const e1: ElevatedEmpployee = {
-  name: "Lee",
-  privileges: ["create-server"],
-  startDate: new Date(),
-};
-
-//인터섹션타입은  유니언의 경우 타입간의 공통점이 있는 타입
-type Combinable = string | number;
-
-type Numeric = number | boolean;
-
-type Universal = Combinable & Numeric;
-
-//타입가드
-//유니언 을 돕는 타입 가드
-//typeof 를 이용한 타입 가드의 예제
-function PLUS(a: number, b: number): number;
-function PLUS(a: Combinable, b: Combinable) {
-  if (typeof a === "string" || typeof b === "string") {
-    return a.toString() + b.toString();
-  }
-  return a + b;
+//제네릭 함수
+function merge<T extends object, U extends object>(abjA: T, objB: U) {
+  return Object.assign(abjA, objB);
 }
 
-type UnkwonEmployee = Employee | Admin;
-//in을 이용해ㅑ서 타입카드
-const printEmployeeInfo = (emp: UnkwonEmployee) => {
-  console.log(`name : ${emp.name}`);
-  if ("privileges" in emp) {
-    console.log(`privileges: ${emp.privileges}`);
-  }
-  if ("startDate" in emp) {
-    console.log(`startDate: ${emp.startDate}`);
-  }
-};
+const mergeObject = merge({ name: "Max", hobbies: ["Sports"] }, { age: 12 });
+const mergeObject2 = merge({ name: "Max" }, { age: 12 });
 
-printEmployeeInfo(e1);
+//별개의 길이 프로퍼티를 인터페이스로 만들어 일단 모든지 길이를 가지도록할수 있다
 
-//class에서 instanceof를 이용해 타입 가드하기
-class Car {
-  drive() {
-    console.log("drive");
-  }
+interface Lengthy {
+  length: number;
 }
 
-class Truck {
-  drive() {
-    console.log("truck");
+function countAndDescibe<T extends Lengthy>(element: T): [T, string] {
+  let de = "Got no value";
+  if (element.length === 1) {
+    de = `Got ${element.length} elements`;
+  } else if (element.length > 1) {
+    de = `Got ${element.length} elements`;
   }
-  loardCargo(amount: number) {
-    console.log(amount);
+
+  return [element, de];
+}
+
+console.log(countAndDescibe("Hi there!"));
+
+function extractConvert<T extends object, U extends keyof T>(obj1: T, key: U) {
+  return `result  ${obj1[key]}`;
+}
+
+console.log(extractConvert({ name: "lee" }, "name"));
+
+class DataStorage<T> {
+  private data: T[] = [];
+  addItem(item: T) {
+    this.data.push(item);
+  }
+
+  removeItem(item: T) {
+    this.data.splice(this.data.indexOf(item), 1);
+  }
+
+  getItems() {
+    return [...this.data];
   }
 }
 
-type Vehicle = Car | Truck;
+const textStorage = new DataStorage<string>();
+textStorage.addItem("max");
+textStorage.addItem("menu");
+textStorage.removeItem("menu");
 
-const v1 = new Car();
-const v2 = new Truck();
-
-const useVehicle = (v: Vehicle) => {
-  v.drive();
-  if (v instanceof Truck) {
-    v.loardCargo(1000);
-  }
-};
-
-useVehicle(v1);
-useVehicle(v2);
-
-//타입가드를 도와주는 구별된 유니언: 타입가드를 쉽게 구현하기 위해 이용됨
-
-interface Bird {
-  type: "bird";
-  flyingSpeed: number;
-}
-interface Horse {
-  type: "horse";
-  runningSpeed: number;
-}
-
-type Animal = Bird | Horse;
-
-const moveAnimal = (a: Animal) => {
-  let speed;
-  switch (a.type) {
-    case "bird":
-      speed = a.flyingSpeed;
-      break;
-    case "horse":
-      speed = a.runningSpeed;
-      break;
-  }
-  console.log(`이동속도${speed}`);
-};
-
-moveAnimal({ type: "bird", flyingSpeed: 100 });
-
-//형변환
-// 타입스크립트가 직접 감지하지 못하는 특정 타입의 값을
-//타입스크립트에 알려주는 역할
-//const input2 = document.getElementById("userInput") as HTMLInputElement;
-//위아래는 같은이야기입니다
-//! <- NULL로 반환하지 않을 것이라는 이야기
-const input = <HTMLInputElement>document.getElementById("userInput")!;
-input.value = "hi there";
-
-interface ErrorContainer {
-  //객체가 지녀야하는 모든 속성을 문자열을 지녀야 한다면
-  //그리고 값도 문자열임을 알고 있어야하는 경우
-  [prop: string]: string;
-}
-
-const errorBag: ErrorContainer = {
-  email: "Not a valid email",
-  username: "Must Start with a capital character",
-};
-
-//함수 오버로드
+console.log(textStorage.getItems());
