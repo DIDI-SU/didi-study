@@ -1,69 +1,41 @@
-// //배열 타입이 하나 만들어지는데 만약 비어있다면 any가 됩니다
-// //제네릭 타입이면 하나의 인수가 필요하다는 에러
-// // Array<t> 제네릭
-// // 제네릭은 타입은 다른 타입과 연결되는 종류인데 다른 타입이
-// //어떤 타입이어야하는지 대해서는 크게 상관하지 않습니다
-// //아래가 바로 제네릭
-// const name2: Array<string> = []; //string[]과 결국 같은이야기
+//데코라이터는 클래스에만 적용됩니다
+//데코헤이터는 클레스를 실체화하기전에도 그 값을 얻을 수 있습니다
+//클래스와 컨스트럭터에 함수정의만 입력되어도
+//데코레이텉는저으이됩니다
 
-// //프로미스타입
-// const promise: Promise<string> = new Promise((re, rej) => {
-//   setTimeout(() => {
-//     re("done");
-//   }, 2000);
-// });
-
-//제네릭 함수
-function merge<T extends object, U extends object>(abjA: T, objB: U) {
-  return Object.assign(abjA, objB);
+function Logger(logString: string) {
+  return function (constructor: Function) {
+    console.log(logString);
+    console.log(constructor);
+  };
 }
+//_ :잇지만 사용안함
+function WithTemplat(template: string, hookId: string) {
+  return function (constructor: any) {
+    console.log("template");
 
-const mergeObject = merge({ name: "Max", hobbies: ["Sports"] }, { age: 12 });
-const mergeObject2 = merge({ name: "Max" }, { age: 12 });
-
-//별개의 길이 프로퍼티를 인터페이스로 만들어 일단 모든지 길이를 가지도록할수 있다
-
-interface Lengthy {
-  length: number;
+    const element = document.getElementById(hookId);
+    const pe = new constructor();
+    if (element) {
+      element.innerHTML = template;
+      element.querySelector("h1")!.textContent = pe.name;
+    }
+  };
 }
-
-function countAndDescibe<T extends Lengthy>(element: T): [T, string] {
-  let de = "Got no value";
-  if (element.length === 1) {
-    de = `Got ${element.length} elements`;
-  } else if (element.length > 1) {
-    de = `Got ${element.length} elements`;
-  }
-
-  return [element, de];
-}
-
-console.log(countAndDescibe("Hi there!"));
-
-function extractConvert<T extends object, U extends keyof T>(obj1: T, key: U) {
-  return `result  ${obj1[key]}`;
-}
-
-console.log(extractConvert({ name: "lee" }, "name"));
-
-class DataStorage<T> {
-  private data: T[] = [];
-  addItem(item: T) {
-    this.data.push(item);
-  }
-
-  removeItem(item: T) {
-    this.data.splice(this.data.indexOf(item), 1);
-  }
-
-  getItems() {
-    return [...this.data];
+@Logger("as")
+@WithTemplat("<h1>hiiii</hi>", "app")
+class Persons {
+  name = "Max";
+  constructor() {
+    console.log("사람만드는중 ");
   }
 }
+const per = new Persons();
+console.log(per);
+//ㄷ데코레잍터 펙토리
 
-const textStorage = new DataStorage<string>();
-textStorage.addItem("max");
-textStorage.addItem("menu");
-textStorage.removeItem("menu");
-
-console.log(textStorage.getItems());
+//어떤대상에게 데코레이터를 할당할지 정할수잇음
+//그리고 동시에 팩토리는 일반 데코레이터 보다
+// 더많은 설정을 적용해서 더많은 방향으로 사용할 수 있음
+//팩토리가 일반 데코리잌터 보다 먼저 들어감ㅇㅇ
+//
