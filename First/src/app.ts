@@ -30,8 +30,7 @@ class Persons {
     console.log("사람만드는중 ");
   }
 }
-const per = new Persons();
-console.log(per);
+
 //ㄷ데코레잍터 펙토리
 
 //어떤대상에게 데코레이터를 할당할지 정할수잇음
@@ -39,3 +38,39 @@ console.log(per);
 // 더많은 설정을 적용해서 더많은 방향으로 사용할 수 있음
 //팩토리가 일반 데코리잌터 보다 먼저 들어감ㅇㅇ
 //
+
+//프로퍼티 데코레이터
+
+function Log(target: any, propertyName: string | symbol) {
+  console.log(`property`);
+  console.log(target, propertyName);
+}
+
+function Log2(target: any, name: string, descriptor: PropertyDescriptor) {
+  console.log("log2");
+  console.log(target);
+  console.log(name);
+  console.log(descriptor);
+}
+
+class Products {
+  @Log
+  title: string;
+  private _price: number;
+  @Log2
+  set price(val: number) {
+    if (val > 0) {
+      this._price = val;
+    } else {
+      throw new Error("price is positive");
+    }
+  }
+
+  constructor(t: string, p: number) {
+    this.title = t;
+    this._price = p;
+  }
+  getPriceWithTax(tax: number) {
+    return this.price * (1 + tax);
+  }
+}
